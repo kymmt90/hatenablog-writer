@@ -7,7 +7,7 @@ class HBWriterTest < Test::Unit::TestCase
     @sut = HBWriter.new
   end
 
-  sub_test_case 'parse valid entry file' do
+  sub_test_case 'parse valid entry file including entry ID' do
     setup do
       @entry = open('test/fixtures/entry.md')
     end
@@ -21,9 +21,39 @@ class HBWriterTest < Test::Unit::TestCase
       assert_equal('Test Title', result[0])
     end
 
+    test 'get the entry ID' do
+      result = @sut.parse_entry(@entry.read)
+      assert_equal('0123456789', result[1])
+    end
+
     test 'get the entry content' do
       result = @sut.parse_entry(@entry.read)
-      assert_equal("This is\n**the test**\nentry.", result[1])
+      assert_equal("This is\n**the test**\nentry.", result[2])
+    end
+  end
+
+  sub_test_case 'parse valid entry file not including entry ID' do
+    setup do
+      @entry = open('test/fixtures/entry2.md')
+    end
+
+    teardown do
+      @entry.close
+    end
+
+    test 'get the entry title' do
+      result = @sut.parse_entry(@entry.read)
+      assert_equal('Test Title', result[0])
+    end
+
+    test 'get the entry content' do
+      result = @sut.parse_entry(@entry.read)
+      assert_equal("This is\n**the test**\nentry.", result[2])
+    end
+
+    test 'insert the ID' do
+      text = @sut.insert_id(@entry.read, '0123456789')
+      assert_equal('<!-- 0123456789 -->', text.split("\n")[1])
     end
   end
 
