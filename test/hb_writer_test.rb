@@ -30,6 +30,11 @@ class HBWriterTest < Test::Unit::TestCase
       result = @sut.parse_entry(@entry.read)
       assert_equal("This is\n**the test**\nentry.", result[2])
     end
+
+    test 'delete ID' do
+      text = @sut.delete_id(@entry.read)
+      assert_equal('', text.split("\n")[1])
+    end
   end
 
   sub_test_case 'parse valid entry file not including entry ID' do

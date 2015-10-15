@@ -16,6 +16,14 @@ class HBWriter
     @blog.update_entry(id, title, content)
   end
 
+  def delete_entry(entry_text)
+    title, id, content = parse_entry(entry_text)
+
+    @blog ||= Hatenablog::Client.create
+    @blog.delete_entry(id)
+    delete_id(entry_text)
+  end
+
   # 1st line      : title
   # 2nd line      : <!-- entryID -->
   # from 3rd line : content
@@ -35,6 +43,12 @@ class HBWriter
   def insert_id(entry_text, id)
     lines = entry_text.to_s.split("\n")
     lines[1] = "<!-- #{id} -->"
+    lines.join("\n")
+  end
+
+  def delete_id(entry_text)
+    lines = entry_text.to_s.split("\n")
+    lines[1] = ''
     lines.join("\n")
   end
 end
