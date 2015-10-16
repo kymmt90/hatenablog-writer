@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
 
 require './hb_writer'
+require 'optparse'
 
-USAGE = './hw <entry>'
+USAGE = './hw [-d] entry'
+
+options = ARGV.getopts('d')
 
 if ARGV.size != 1
   warn USAGE
@@ -11,7 +14,11 @@ end
 
 writer = HBWriter.new
 open(ARGV[0], 'r+') do |f|
-  entry = writer.post_entry(f.read)
+  if options['d']
+    entry = writer.delete_entry(f.read)
+  else
+    entry = writer.post_entry(f.read)
+  end
   f.seek(0, IO::SEEK_SET)
   f.write(entry)
 end
