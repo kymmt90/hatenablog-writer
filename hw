@@ -3,22 +3,29 @@
 require './hb_writer'
 require 'optparse'
 
-USAGE = './hw [-d] entry'
+USAGE = 'Usage: hw [-d | -u] entry'
 
-options = ARGV.getopts('d')
+options = ARGV.getopts('du')
 
-if ARGV.size != 1
+if ARGV.size != 1 || (options['d'] && options['u'])
   warn USAGE
   exit
 end
 
 writer = HBWriter.new
-open(ARGV[0], 'r+') do |f|
+entry_text = ''
+open(ARGV[0], 'r') do |f|
   if options['d']
-    entry = writer.delete_entry(f.read)
+    entry_text = writer.delete_entry(f.read)
+  elsif options['u']
+    writer.update_entry(f.read)
   else
-    entry = writer.post_entry(f.read)
+    entry_text = writer.post_entry(f.read)
   end
-  f.seek(0, IO::SEEK_SET)
-  f.write(entry)
+end
+
+unless entry_text.empty?
+  open(ARGV[0], 'w') do |f|
+    f.write(entry_text)
+  end
 end
