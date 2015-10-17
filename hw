@@ -3,9 +3,9 @@
 require './hb_writer'
 require 'optparse'
 
-USAGE = 'Usage: hw [-d | -u] entry'
+USAGE = 'Usage: hw [-d | -u | -m] entry'
 
-options = ARGV.getopts('du')
+options = ARGV.getopts('dum')
 
 if ARGV.size != 1 || (options['d'] && options['u'])
   warn USAGE
@@ -19,6 +19,8 @@ open(ARGV[0], 'r') do |f|
     entry_text = writer.delete_entry(f.read)
   elsif options['u']
     writer.update_entry(f.read)
+  elsif options['m']
+    writer.minor_update_entry(f.read)
   else
     entry_text = writer.post_entry(f.read)
   end

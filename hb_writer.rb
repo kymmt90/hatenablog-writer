@@ -17,6 +17,16 @@ class HBWriter
     @blog.update_entry(id, title, content)
   end
 
+  def minor_update_entry(entry_text)
+    title, id, content = parse_entry(entry_text)
+    raise HBWriterError, 'entry ID does not exixt' if id.empty?
+
+    @blog ||= Hatenablog::Client.create
+    entry = @blog.get_entry(id)
+    draft = entry.draft? ? 'yes' : 'no'
+    @blog.update_entry(id, title, content, entry.categories, draft, entry.updated.iso8601)
+  end
+
   def delete_entry(entry_text)
     title, id, content = parse_entry(entry_text)
     raise HBWriterError, 'entry ID does not exixt' if id.empty?
