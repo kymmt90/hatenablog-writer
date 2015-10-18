@@ -11,17 +11,17 @@ class HBWriter
 
   def update_entry(entry_text)
     title, id, content = parse_entry(entry_text)
-    raise HBWriterError, 'entry ID does not exixt' if id.empty?
 
     @blog ||= Hatenablog::Client.create
+    id = find_entry_id(title) if id.empty?
     @blog.update_entry(id, title, content)
   end
 
   def minor_update_entry(entry_text)
     title, id, content = parse_entry(entry_text)
-    raise HBWriterError, 'entry ID does not exixt' if id.empty?
 
     @blog ||= Hatenablog::Client.create
+    id    = find_entry_id(title) if id.empty?
     entry = @blog.get_entry(id)
     draft = entry.draft? ? 'yes' : 'no'
     @blog.update_entry(id, title, content, entry.categories, draft, entry.updated.iso8601)
@@ -29,9 +29,9 @@ class HBWriter
 
   def delete_entry(entry_text)
     title, id, content = parse_entry(entry_text)
-    raise HBWriterError, 'entry ID does not exixt' if id.empty?
 
     @blog ||= Hatenablog::Client.create
+    id = find_entry_id(title) if id.empty?
     @blog.delete_entry(id)
     delete_id(entry_text)
   end
@@ -50,6 +50,18 @@ class HBWriter
     content = lines[2..-1].join("\n")
 
     [title, id, content]
+  end
+
+  # find an entry ID by its title.
+  # return empty string if the entry is not found.
+  def find_entry_id(title)
+    feed = @blog.next_feed
+    while true
+      found_entry = feed.entries.find { |entry| title == entry.title }
+      return found_entry.id unless found_entry.nil?
+      feed = @blog.next_feed(feed)
+      raise HBWriterError, "entry is not found: #{title}" if feed.nil?
+    end
   end
 
   def insert_id(entry_text, id)
