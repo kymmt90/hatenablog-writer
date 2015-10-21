@@ -3,23 +3,39 @@
 require './hb_writer'
 require 'optparse'
 
-USAGE = 'Usage: hw [-d | -u | -m] entry'
+def warn_and_exit(message)
+  warn message
+  exit 1
+end
 
-options = ARGV.getopts('dum')
+OPTS = {}
+OptionParser.new do |opt|
+  opt.banner = 'Usage: hw [options] entry_file'.freeze
 
-if ARGV.size != 1 || (options['d'] && options['u'])
-  warn USAGE
-  exit
+  opt.on('-d', '--delete', 'delete entry from blog') { |v| OPTS[:d] = v }
+  opt.on('-u', '--update', 'update entry') { |v| OPTS[:u] = v }
+  opt.on('-m', '--minor-update',
+         'update entry without changing updated datetime') { |v| OPTS[:m] = v }
+
+  begin
+    opt.parse!(ARGV)
+  rescue => error
+    puts error
+    warn_and_exit(opt.help)
+  end
+
+  num_on_opts = OPTS.select { |k, v| v == true }.size.freeze
+  warn_and_exit(opt.help) if num_on_opts > 1 || ARGV.size == 0
 end
 
 writer = HBWriter.new
 entry_text = ''
 open(ARGV[0], 'r') do |f|
-  if options['d']
+  if OPTS[:d]
     entry_text = writer.delete_entry(f.read)
-  elsif options['u']
+  elsif OPTS[:u]
     writer.update_entry(f.read)
-  elsif options['m']
+  elsif OPTS[:m]
     writer.minor_update_entry(f.read)
   else
     entry_text = writer.post_entry(f.read)
