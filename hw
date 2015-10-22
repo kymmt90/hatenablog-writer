@@ -43,6 +43,7 @@ ARGV.each do |file_name|
     end
   end
 
+  # write entry ID to text file
   unless entry_text.empty?
     open(file_name, 'w') do |f|
       f.write(entry_text)
