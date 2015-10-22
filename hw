@@ -29,21 +29,23 @@ OptionParser.new do |opt|
 end
 
 writer = HBWriter.new
-entry_text = ''
-open(ARGV[0], 'r') do |f|
-  if OPTS[:d]
-    entry_text = writer.delete_entry(f.read)
-  elsif OPTS[:u]
-    writer.update_entry(f.read)
-  elsif OPTS[:m]
-    writer.minor_update_entry(f.read)
-  else
-    entry_text = writer.post_entry(f.read)
+ARGV.each do |file_name|
+  entry_text = ''
+  open(file_name, 'r') do |f|
+    if OPTS[:d]
+      entry_text = writer.delete_entry(f.read)
+    elsif OPTS[:u]
+      writer.update_entry(f.read)
+    elsif OPTS[:m]
+      writer.minor_update_entry(f.read)
+    else
+      entry_text = writer.post_entry(f.read)
+    end
   end
-end
 
-unless entry_text.empty?
-  open(ARGV[0], 'w') do |f|
-    f.write(entry_text)
+  unless entry_text.empty?
+    open(file_name, 'w') do |f|
+      f.write(entry_text)
+    end
   end
 end
