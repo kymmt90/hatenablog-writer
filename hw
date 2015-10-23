@@ -10,7 +10,7 @@ end
 
 OPTS = {}
 OptionParser.new do |opt|
-  opt.banner = 'Usage: hw [options] entry_file'.freeze
+  opt.banner = 'Usage: hw [options] entry_file ...'.freeze
 
   opt.on('-d', '--delete', 'delete entry from blog') { |v| OPTS[:d] = v }
   opt.on('-u', '--update', 'update entry') { |v| OPTS[:u] = v }
