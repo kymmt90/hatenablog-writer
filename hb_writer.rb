@@ -5,25 +5,36 @@ class HBWriter
     @blog = Hatenablog::Client.create
   end
 
-  def post_entry(entry_text)
+  def post_entry(entry_text, categories)
     title, id, content = parse_entry(entry_text)
-    posted_entry = @blog.post_entry(title, content)
+    posted_entry = @blog.post_entry(title, content, categories)
     insert_id(entry_text, posted_entry.id)
   end
 
-  def update_entry(entry_text)
-    title, id, content = parse_entry(entry_text)
-    id = find_entry_id(title) if id.empty?
-    @blog.update_entry(id, title, content)
-  end
-
-  def minor_update_entry(entry_text)
+  def update_entry(entry_text, categories)
     title, id, content = parse_entry(entry_text)
     id    = find_entry_id(title) if id.empty?
     entry = @blog.get_entry(id)
     draft = entry.draft? ? 'yes' : 'no'
-    @blog.update_entry(id,               title, content,
-                       entry.categories, draft, entry.updated.iso8601)
+    if categories.empty?
+      @blog.update_entry(id, title, content, entry.categories, draft)
+    else
+      @blog.update_entry(id, title, content, categories, draft)
+    end
+  end
+
+  def minor_update_entry(entry_text, categories)
+    title, id, content = parse_entry(entry_text)
+    id    = find_entry_id(title) if id.empty?
+    entry = @blog.get_entry(id)
+    draft = entry.draft? ? 'yes' : 'no'
+    if categories.empty?
+      @blog.update_entry(id,               title, content,
+                         entry.categories, draft, entry.updated.iso8601)
+    else
+      @blog.update_entry(id,         title, content,
+                         categories, draft, entry.updated.iso8601)
+    end
   end
 
   def delete_entry(entry_text)

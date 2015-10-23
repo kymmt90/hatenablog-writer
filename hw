@@ -9,9 +9,11 @@ def warn_and_exit(message)
 end
 
 OPTS = {}
+CATEGORIES = []
 OptionParser.new do |opt|
   opt.banner = 'Usage: hw [options] entry_file ...'.freeze
 
+  opt.on('-c [CATEGORY]', 'specify category') { |v| CATEGORIES << v }
   opt.on('-d', '--delete', 'delete entry from blog') { |v| OPTS[:d] = v }
   opt.on('-u', '--update', 'update entry') { |v| OPTS[:u] = v }
   opt.on('-m', '--minor-update',
@@ -35,11 +37,11 @@ ARGV.each do |file_name|
     if OPTS[:d]
       entry_text = writer.delete_entry(f.read)
     elsif OPTS[:u]
-      writer.update_entry(f.read)
+      writer.update_entry(f.read, CATEGORIES)
     elsif OPTS[:m]
-      writer.minor_update_entry(f.read)
+      writer.minor_update_entry(f.read, CATEGORIES)
     else
-      entry_text = writer.post_entry(f.read)
+      entry_text = writer.post_entry(f.read, CATEGORIES)
     end
   end
 
