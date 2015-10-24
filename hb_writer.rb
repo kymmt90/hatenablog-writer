@@ -3,6 +3,11 @@ require 'hatenablog'
 class HBWriter
   def initialize
     @blog = Hatenablog::Client.create
+    if block_given?
+      yield self
+    else
+      self
+    end
   end
 
   def post_entry(entry_text, categories)

@@ -32,25 +32,26 @@ OptionParser.new do |opt|
   warn_and_exit(opt.help) if num_on_opts > 1 || ARGV.size == 0
 end
 
-writer = HBWriter.new
-ARGV.each do |file_name|
-  entry_text = ''
-  open(file_name, 'r') do |f|
-    if OPTS[:d]
-      entry_text = writer.delete_entry(f.read)
-    elsif OPTS[:u]
-      writer.update_entry(f.read, CATEGORIES)
-    elsif OPTS[:m]
-      writer.minor_update_entry(f.read, CATEGORIES)
-    else
-      entry_text = writer.post_entry(f.read, CATEGORIES)
+HBWriter.new do |hb_writer|
+  ARGV.each do |file_name|
+    entry_text = ''
+    open(file_name, 'r') do |f|
+      if OPTS[:d]
+        entry_text = hb_writer.delete_entry(f.read)
+      elsif OPTS[:u]
+        hb_writer.update_entry(f.read, CATEGORIES)
+      elsif OPTS[:m]
+        hb_writer.minor_update_entry(f.read, CATEGORIES)
+      else
+        entry_text = hb_writer.post_entry(f.read, CATEGORIES)
+      end
     end
-  end
 
-  # write/delete entry ID
-  unless entry_text.empty?
-    open(file_name, 'w') do |f|
-      f.write(entry_text)
+    # write/delete entry ID
+    unless entry_text.empty?
+      open(file_name, 'w') do |f|
+        f.write(entry_text)
+      end
     end
   end
 end
