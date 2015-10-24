@@ -49,6 +49,7 @@ class HBWriter
     delete_id(entry_text)
   end
 
+  # parse an entry text as the following format:
   # 1st line      : title
   # 2nd line      : <!-- entryID -->
   # from 3rd line : content
@@ -66,7 +67,6 @@ class HBWriter
   end
 
   # find an entry ID by its title.
-  # return empty string if the entry is not found.
   def find_entry_id(title)
     feed = @blog.next_feed
     while true
