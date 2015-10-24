@@ -26,6 +26,8 @@ OptionParser.new do |opt|
     warn_and_exit(opt.help)
   end
 
+  # mutiple options (ex. -d and -u) is invalid
+  # at least one input file must be specified
   num_on_opts = OPTS.select { |k, v| v == true }.size.freeze
   warn_and_exit(opt.help) if num_on_opts > 1 || ARGV.size == 0
 end
@@ -45,7 +47,7 @@ ARGV.each do |file_name|
     end
   end
 
-  # write entry ID to text file
+  # write/delete entry ID
   unless entry_text.empty?
     open(file_name, 'w') do |f|
       f.write(entry_text)
