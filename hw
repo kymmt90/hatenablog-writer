@@ -8,6 +8,8 @@ def warn_and_exit(message)
   exit 1
 end
 
+Version = '0.1.0'
+
 OPTS = {}
 CATEGORIES = []
 OptionParser.new do |opt|
